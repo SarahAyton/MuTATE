@@ -1,0 +1,33 @@
+Package: MuTATE
+Title: Multi-Target Automated Tree Engine (MuTATE)
+Version: 0.0.0.9000
+Authors@R: 
+    person("Sarah", "Ayton", , "sarah.ayton@columbia.edu", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0001-5247-9912"))
+Description: Collection of functions to recursively partition datasets on binary splits across multiple targets.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Depends: 
+    R (>= 3.1)
+Imports: 
+    reshape2, 
+    matrixStats, 
+    survival,
+    stringr, 
+    Hmisc, 
+    irr, 
+    Metrics, 
+    plotrix,
+    scales,
+    stats,
+    caret,
+    dplyr,
+    igraph,
+    ggraph,
+    grDevices
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
