@@ -31,9 +31,6 @@
 #' @return A data frame containing the results of hyperparameter tuning for the MTPart model.
 #' @export
 #' @import caret
-#' @exclude caret precision
-#' @importFrom caret::cluster exclude=TRUE
-#' @importFrom caret::recall exclude=TRUE
 
 CV_Tune <- function(features, outcomes, outcome_defs, data,
                     continuous = "quantile", quantseq = seq(0,1,0.25), wt=NULL, reuse=FALSE,
