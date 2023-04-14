@@ -11,6 +11,8 @@
 #'   \item \code{tree_nodes}: A list of pruned decision tree objects, one for each node in the original tree.
 #' }
 #'
+#' @export
+
 MTPrune <- function(tree, cp = 0.02){
   # Extract parent-child relationships & tree nodes
   df <- tree[[1]]

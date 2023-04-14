@@ -36,6 +36,7 @@
 #' feature binarization for evaluation (i.e., a binarized feature must result in
 #' partitions with sufficient observations in both child nodes). The default value is of
 #' \code{splitmin} is set to half of the \code{nodesize}.
+#' @export
 
 
 MTPart <- function(features, outcomes, outcome_defs, data, continuous = "quantile", quantseq = seq(0,1,0.25),

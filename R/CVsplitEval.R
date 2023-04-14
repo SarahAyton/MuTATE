@@ -39,7 +39,6 @@
 #'
 #' @usage CVsplitEval(splitvar, X, targets, data)
 #' @seealso Other relevant R functions include `glm`, `accuracy`, `kappa2`, and `rmse`.
-#' @keywords binary classification, performance evaluation, data splitting
 #'
 
 CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcomes

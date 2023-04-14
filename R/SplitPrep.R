@@ -44,6 +44,7 @@
 #'
 #' @return A list containing two data frames: the modified predictor variable
 #' data frame and the modified response variable data frame.
+#' @export
 
 SplitPrep <- function(Xdf, df, data_splt, parentsplit) {
   df <- droplevels(data.frame(df))

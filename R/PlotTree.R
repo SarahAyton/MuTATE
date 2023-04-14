@@ -9,6 +9,7 @@
 #' @import ggraph
 #' @import grDevices
 #' @import graphics
+#' @export
 
 PlotTree <- function(tree) {
   # Extract parent and child node IDs

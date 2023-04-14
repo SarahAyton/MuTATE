@@ -12,6 +12,7 @@
 #'
 #' @import dplyr
 #' @import stats
+#' @export
 
 MTPartSummary <- function(tree) {
   # Extract parent and child node IDs

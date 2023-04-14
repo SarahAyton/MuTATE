@@ -42,9 +42,3 @@ the accuracy, kappa, and root mean squared error are calculated using the \code{
 \seealso{
 Other relevant R functions include \code{glm}, \code{accuracy}, \code{kappa2}, and \code{rmse}.
 }
-\keyword{binary}
-\keyword{classification,}
-\keyword{data}
-\keyword{evaluation,}
-\keyword{performance}
-\keyword{splitting}

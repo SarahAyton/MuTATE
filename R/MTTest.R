@@ -10,6 +10,7 @@
 #' @param wt An optional numeric vector of weights for the test data.
 #'
 #' @return A list of evaluation results for the test data.
+#' @export
 
 MTTest <- function(tree, features, outcomes, outcome_defs, data_test, wt=NULL) {
   Z_test <- list("Definitions"=outcome_defs, "Z"=data_test[,c(outcomes)])

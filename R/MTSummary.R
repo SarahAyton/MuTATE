@@ -29,6 +29,7 @@
 #' the estimated rate of the count, and the deviance.
 #'
 #' @return A list of lists with each element corresponding to an outcome in targets.
+#' @export
 #'
 #' @importFrom stats complete.cases deviance gaussian glm lm pnorm predict quantile residuals weighted.mean
 #' @importFrom utils head
