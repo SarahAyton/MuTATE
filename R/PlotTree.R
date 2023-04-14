@@ -141,7 +141,7 @@ PlotTree <- function(tree) {
   V(g)$shape <- nodeshapes[V(g)]
   try <- plot(g, layout=layout.reingold.tilford)
   # Find the leaf nodes of the graph
-  plot(g, layout = layout.reingold.tilford(g, root=1), rescale=FALSE, asp=1,
+  pfin <- plot(g, layout = layout.reingold.tilford(g, root=1), rescale=FALSE, asp=1,
        ylim=c(min(layout$y)-0.5,max(layout$y)+0.5), xlim=c(min(layout$x)-0.5,max(layout$x)+0.5),
        vertex.size=((strwidth(label_node) + strwidth("oooo")) * 100),
        vertex.size2= strheight(label_node) * 2 * 75, #vertex.shape="ellipse",
@@ -150,4 +150,5 @@ PlotTree <- function(tree) {
        edge.label=label_arrow, edge.label.family='Times', edge.label.cex=0.5, edge.label.color= "black",
        edge.arrow.size=0.15, arr.type="triangle", edge.arrow.color= "black",
        margin=c(0,0,0,0))
+  return(pfin)
 }
