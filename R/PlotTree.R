@@ -150,10 +150,4 @@ PlotTree <- function(tree) {
        edge.label=label_arrow, edge.label.family='Times', edge.label.cex=0.5, edge.label.color= "black",
        edge.arrow.size=0.15, arr.type="triangle", edge.arrow.color= "black",
        margin=c(0,0,0,0))
-  # Saved in the object
-  res = recordPlot()
-  # Clear the Plot Window
-  plot.new()
-  # Saved Plot
-  return(res)
 }
