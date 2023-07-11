@@ -2,7 +2,7 @@ Package: MuTATE
 Title: Multi-Target Automated Tree Engine (MuTATE)
 Version: 0.0.0.9000
 Authors@R: 
-    person("Sarah", "Ayton", "sarah.ayton@columbia.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5247-9912")),
+    person("Sarah", "Ayton", "sarah.ayton@columbia.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5247-9912"))
     person("Victor", "Trevino", "vtrevino@tec.mx", role = c("aut"), comment = c(ORCID = "0000-0002-7472-9844"))
 Description: Collection of functions to recursively partition datasets on binary splits across multiple targets.
 License: MIT + file LICENSE
