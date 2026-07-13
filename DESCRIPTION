@@ -1,0 +1,45 @@
+Package: MuTATE
+Title: Multi-Target Automated Tree Engine (MuTATE)
+Version: 0.1.0
+Authors@R: c(
+    person("Sarah", "Ayton", , "sarah.ayton@columbia.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5247-9912")) )
+Description: Provides functions to recursively partition a dataset on binary
+    feature splits chosen jointly across multiple outcome variables of
+    different types (categorical, continuous, count, and survival), rather
+    than a single target as in a standard decision tree. This produces one
+    interpretable tree that characterizes candidate subgroups across several
+    outcomes of interest simultaneously, while retaining model
+    interpretability. The package includes model fitting, pruning,
+    cross-validated hyperparameter tuning, prediction on new data, and
+    visualization functions.
+License: MIT + file LICENSE
+URL: https://github.com/SarahAyton/MuTATE
+BugReports: https://github.com/SarahAyton/MuTATE/issues
+Encoding: UTF-8
+Language: en-US
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 3.5)
+Imports:
+    reshape2,
+    matrixStats,
+    survival,
+    stringr,
+    irr,
+    Metrics,
+    plotrix,
+    scales,
+    stats,
+    caret,
+    dplyr,
+    igraph,
+    ggraph,
+    grDevices
+Suggests:
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0
+LazyData: true
+VignetteBuilder: knitr
