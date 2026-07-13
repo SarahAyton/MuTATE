@@ -2,7 +2,7 @@ Package: MuTATE
 Title: Multi-Target Automated Tree Engine (MuTATE)
 Version: 0.1.0
 Authors@R: c(
-    person("Sarah", "Ayton", , "sarah.ayton@columbia.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0001-5247-9912")) )
+    person("Sarah", "Ayton", , "sarah.ayton@columbia.edu", role = c("aut", "cre", "cph"), comment = c(ORCID = "0000-0001-5247-9912")) )
 Description: Provides functions to recursively partition a dataset on binary
     feature splits chosen jointly across multiple outcome variables of
     different types (categorical, continuous, count, and survival), rather
