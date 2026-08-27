@@ -2,15 +2,9 @@
 #' @aliases CVsplitEval
 #' @title Evaluate the performance of binary classifiers
 #'
-#' @import stringr
-#' @import Hmisc
-#' @import irr
-#' @import Metrics
-#'
-# @import glm
-# @import accuracy
-# @import kappa2
-# @import rmse
+#' @importFrom stringr str_remove
+#' @importFrom irr kappa2
+#' @importFrom Metrics accuracy mae rmse
 #'
 #' @description A function that evaluates the performance of binary classifiers based on data split criteria
 #'
@@ -40,6 +34,15 @@
 #' @usage CVsplitEval(splitvar, X, targets, data)
 #' @seealso Other relevant R functions include `glm`, `accuracy`, `kappa2`, and `rmse`.
 #'
+#' @examples
+#' data(mutate_example)
+#' features <- c("age", "sex", "biomarker")
+#' outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+#' outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+#' targets <- list(Definitions = outcome_defs, Z = mutate_example[, outcomes])
+#'
+#' result <- CVsplitEval("age < 60", mutate_example[, features], targets, mutate_example)
+#' @export
 
 CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcomes
   MT <- as.list(1:((length(colnames(targets[[2]])))))
@@ -69,7 +72,6 @@ CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcom
         varlev <- paste((names(propZ[(propZ)>=max(propZ)])))
         dataX$Zvar <- as.factor(dataX[,1])
 
-        set.seed(123)
         model_b <- glm(Zvar ~ binrule, family="binomial", data = (dataX))
         Accuracy <- accuracy(dataX[complete.cases(dataX),]$Zvar, predict(model_b))
 
@@ -100,8 +102,6 @@ CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcom
         dataX <- dataX[complete.cases(dataX),]
         dataX$Zvar <- (dataX[,1])
 
-        set.seed(123)
-
         model_b <- glm(Zvar ~ binrule, family="poisson", data = (dataX[complete.cases(dataX),]))
 
         RMSE <- rmse(dataX[complete.cases(dataX),]$Zvar, predict(model_b))
@@ -131,8 +131,6 @@ CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcom
         dataX <- dataX[complete.cases(dataX),]
         dataX$Zvar <- (dataX[,1])
 
-        set.seed(123)
-
         model_b <- glm(Zvar ~ binrule, family="poisson", data = (dataX[complete.cases(dataX),]))
 
         RMSE <- rmse(dataX[complete.cases(dataX),]$Zvar, predict(model_b))
@@ -160,8 +158,6 @@ CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcom
         ZnumX <- which(colnames(dataX)==Zname)
         dataX$Zvar <- dataX[,c(ZnumX)]
 
-        set.seed(123)
-
         model_b <- glm(Zvar ~ binrule, data = (dataX[complete.cases(dataX),]), family = gaussian)
 
         RMSE <- rmse(dataX[complete.cases(dataX),]$Zvar, predict(model_b))
@@ -185,7 +181,6 @@ CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcom
     else {
       if (targets$Definitions[i] =="Cat") {
 
-        set.seed(123)
         Accuracy <- 0
         Kappa    <- 0
 
@@ -201,8 +196,6 @@ CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcom
         MT[[i]] <- vardata
       }
       else if (targets$Definitions[i] =="Surv") {
-
-        set.seed(123)
 
         RMSE <- 0
         MAE  <- NA
@@ -223,8 +216,6 @@ CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcom
       }
       else if (targets$Definitions[i] =="Count") {
 
-        set.seed(123)
-
         RMSE <- 0
         MAE  <- NA
         Rsquared <- 0
@@ -243,7 +234,6 @@ CVsplitEval <- function(splitvar, X, targets, data) {#enter dataframe and outcom
         MT[[i]] <- vardata
       }
       else {
-        set.seed(123)
 
         RMSE <- 0
         MAE  <- NA

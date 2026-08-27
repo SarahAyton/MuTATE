@@ -39,3 +39,10 @@ of events, the estimated rate of the event, and the deviance.
 For count targets, the function computes the number of missing values, the total count,
 the estimated rate of the count, and the deviance.
 }
+\examples{
+data(mutate_example)
+outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+targets <- list(Definitions = outcome_defs, Z = mutate_example[, outcomes])
+summ <- MTSummary(targets, mutate_example)
+}

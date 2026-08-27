@@ -10,11 +10,24 @@
 #' @param wt An optional numeric vector of weights for the test data.
 #'
 #' @return A list of evaluation results for the test data.
+#'
+#' @examples
+#' data(mutate_example)
+#' features <- c("age", "sex", "biomarker")
+#' outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+#' outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+#'
+#' train <- mutate_example[1:150, ]
+#' tree <- MTPart(features, outcomes, outcome_defs, train,
+#'                depth = 2, nodesize = 30)
+#' test_result <- MTTest(tree, features, outcomes, outcome_defs, train)
 #' @export
 
 MTTest <- function(tree, features, outcomes, outcome_defs, data_test, wt=NULL) {
-  Z_test <- list("Definitions"=outcome_defs, "Z"=data_test[,c(outcomes)])
-  X_test <- data_test[,c(features)]
+  validate_tree_object(tree)
+  validate_core_inputs(features, outcomes, outcome_defs, data_test, wt, data_arg = "data_test")
+  Z_test <- list("Definitions"=outcome_defs, "Z"=data_test[,c(outcomes),drop=FALSE])
+  X_test <- data_test[,c(features),drop=FALSE]
   # Import trained tree
   df <- tree[[1]]
   mtpart_splits <- (tree[[2]])

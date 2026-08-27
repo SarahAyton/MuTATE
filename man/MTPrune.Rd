@@ -21,3 +21,13 @@ A list with two elements:
 \description{
 Prune a MTPart decision tree object using minimal cost-complexity pruning based on the specified complexity parameter (CP) value.
 }
+\examples{
+data(mutate_example)
+features <- c("age", "sex", "biomarker")
+outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+
+tree <- MTPart(features, outcomes, outcome_defs, mutate_example[1:150, ],
+               depth = 2, nodesize = 30)
+pruned <- MTPrune(tree, cp = 0.02)
+}

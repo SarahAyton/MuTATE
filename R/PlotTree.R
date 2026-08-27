@@ -4,11 +4,22 @@
 #'
 #' @param tree A decision tree object.
 #'
-#' @return A plot of the multi-target decision tree.
-#' @import igraph
-#' @import ggraph
-#' @import grDevices
-#' @import graphics
+#' @return A plot of the multi-target decision tree (invisible; called for its plotting side effect).
+#'
+#' @examples
+#' data(mutate_example)
+#' features <- c("age", "sex", "biomarker")
+#' outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+#' outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+#'
+#' tree <- MTPart(features, outcomes, outcome_defs, mutate_example[1:150, ],
+#'                depth = 2, nodesize = 30)
+#' PlotTree(tree)
+#' @importFrom igraph V V<- add_shape graph.data.frame layout.reingold.tilford shapes
+#' @importFrom ggraph create_layout
+#' @importFrom grDevices col2rgb
+#' @importFrom graphics plot strheight strwidth
+#' @importFrom dplyr %>% bind_rows mutate
 #' @export
 
 PlotTree <- function(tree) {

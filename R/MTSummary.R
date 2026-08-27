@@ -29,9 +29,17 @@
 #' the estimated rate of the count, and the deviance.
 #'
 #' @return A list of lists with each element corresponding to an outcome in targets.
+#'
+#' @examples
+#' data(mutate_example)
+#' outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+#' outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+#' targets <- list(Definitions = outcome_defs, Z = mutate_example[, outcomes])
+#' summ <- MTSummary(targets, mutate_example)
 #' @export
 #'
-#' @importFrom stats complete.cases deviance gaussian glm lm pnorm predict quantile residuals weighted.mean
+#' @importFrom stats complete.cases deviance gaussian glm lm pnorm predict quantile residuals sd weighted.mean
+#' @importFrom survival Surv survreg
 #' @importFrom utils head
 
 MTSummary <- function(targets, data) {#enter dataframe and outcomes

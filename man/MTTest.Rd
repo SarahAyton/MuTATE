@@ -25,3 +25,14 @@ A list of evaluation results for the test data.
 \description{
 A function to perform tree-based evaluation on test data using a trained tree model.
 }
+\examples{
+data(mutate_example)
+features <- c("age", "sex", "biomarker")
+outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+
+train <- mutate_example[1:150, ]
+tree <- MTPart(features, outcomes, outcome_defs, train,
+               depth = 2, nodesize = 30)
+test_result <- MTTest(tree, features, outcomes, outcome_defs, train)
+}

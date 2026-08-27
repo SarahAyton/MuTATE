@@ -29,8 +29,24 @@
 #'         igrange, psplitrange, pdepthrange, cp_val)
 #'
 #' @return A data frame containing the results of hyperparameter tuning for the MTPart model.
+#'
+#' @examples
+#' \donttest{
+#' data(mutate_example)
+#' features <- c("age", "sex", "biomarker")
+#' outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+#' outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+#'
+#' # A minimal single-point grid, just for illustration - a real tuning run
+#' # would search over wider ranges for drange/noderange/method/etc.
+#' cv_results <- CV_Tune(features, outcomes, outcome_defs, mutate_example,
+#'                        kfolds = 2, Y = "response",
+#'                        drange = 2, noderange = 30, splitmin_div = 2,
+#'                        method = "avgIG", alpharange = 0.05, igrange = 0.95,
+#'                        psplitrange = 1, pdepthrange = 1, cp_val = 0)
+#' }
 #' @export
-#' @import caret
+#' @importFrom caret createFolds
 
 CV_Tune <- function(features, outcomes, outcome_defs, data,
                     continuous = "quantile", quantseq = seq(0,1,0.25), wt=NULL, reuse=FALSE,
@@ -44,6 +60,14 @@ CV_Tune <- function(features, outcomes, outcome_defs, data,
                     psplitrange = c(seq(1, 2, by=1)),
                     pdepthrange = c(seq(1, 2, by=1)),
                     cp_val = c(seq(-1, 0, by=0.5)) ) {
+  validate_core_inputs(features, outcomes, outcome_defs, data, wt)
+  if (!is.character(Y) || length(Y) != 1 || !(Y %in% colnames(data))) {
+    stop("`Y` must be a single column name present in `data`, got: ",
+         paste(Y, collapse = ", "), call. = FALSE)
+  }
+  if (!is.numeric(kfolds) || length(kfolds) != 1 || kfolds < 2 || kfolds != round(kfolds)) {
+    stop("`kfolds` must be a single integer >= 2, got ", kfolds, ".", call. = FALSE)
+  }
   set.seed(seedno)
   # Create a grid of parameter combinations to search over
   paramGrid <- expand.grid(depth=drange, nodesize=noderange, splitmin_div=splitmin_div, method=method,

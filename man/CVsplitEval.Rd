@@ -39,6 +39,15 @@ Note that the function uses the \code{glm} function in R to fit the binary class
 the accuracy, kappa, and root mean squared error are calculated using the \code{accuracy},
 \code{kappa2}, and \code{rmse} functions, respectively.
 }
+\examples{
+data(mutate_example)
+features <- c("age", "sex", "biomarker")
+outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+targets <- list(Definitions = outcome_defs, Z = mutate_example[, outcomes])
+
+result <- CVsplitEval("age < 60", mutate_example[, features], targets, mutate_example)
+}
 \seealso{
 Other relevant R functions include \code{glm}, \code{accuracy}, \code{kappa2}, and \code{rmse}.
 }

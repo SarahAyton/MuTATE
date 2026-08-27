@@ -1,0 +1,155 @@
+---
+title: "Getting started with MuTATE"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with MuTATE}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+## What MuTATE does
+
+MuTATE (Multi-Target Automated Tree Engine) recursively partitions a dataset
+on binary feature splits, chosen to jointly separate **multiple outcome
+variables at once**, rather than a single target the way a standard decision
+tree (e.g. `rpart`) does. This is useful when you want one interpretable tree
+that explains, say, response, tumor size, adverse-event burden, and survival
+simultaneously - for example when characterizing candidate patient subtypes
+across several clinically relevant endpoints at once.
+
+At each node, MuTATE evaluates every candidate feature split against every
+outcome, standardizes the information gain across outcome types, and picks
+the split that performs best in aggregate (governed by the `evalmethod`
+argument - see `?MTPart`).
+
+MuTATE supports four outcome types, set via `outcome_defs`:
+
+| Code    | Outcome type            | Example              |
+|---------|--------------------------|-----------------------|
+| `"Cat"`   | Categorical              | treatment response    |
+| `"Cont"`  | Continuous               | tumor size             |
+| `"Count"` | Count / event rate       | adverse event count    |
+| `"Surv"`  | Time-to-event (survival) | overall survival        |
+
+```{r setup}
+library(MuTATE)
+data(mutate_example)
+head(mutate_example)
+```
+
+`mutate_example` is a small simulated dataset shipped with the package (see
+`?mutate_example`) with three features (`age`, `sex`, `biomarker`) and four
+outcomes, one of each supported type.
+
+## The survival outcome naming convention
+
+Before fitting a tree, note one MuTATE-specific quirk: for a `"Surv"`
+outcome, the name you pass in `outcomes` must itself be a column in `data`,
+and its 3rd and 4th underscore-separated tokens must exactly match the names
+of the actual time and event columns. In `mutate_example`, the time column is
+`time`, the event column is `status`, and the outcome name that encodes both
+is `OS_definition_time_status`:
+
+```{r}
+strsplit("OS_definition_time_status", "_")[[1]]
+# [3] "time"   -> must match the time column name
+# [4] "status" -> must match the event column name
+```
+
+## Fitting a tree
+
+```{r}
+features     <- c("age", "sex", "biomarker")
+outcomes     <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+
+tree <- MTPart(
+  features, outcomes, outcome_defs, mutate_example,
+  depth    = 2,   # maximum tree depth
+  nodesize = 30   # minimum observations per node before it can be split
+)
+```
+
+`MTPart()` returns a list with two elements:
+
+- `partitions`: a data frame describing the parent/child relationships between nodes.
+- `tree_nodes`: a list with one entry per node, holding the split rule, sample size, and per-outcome summary statistics for that node.
+
+```{r}
+tree$partitions
+```
+
+## Summarizing the tree
+
+`MTPartSummary()` collapses the tree into a table of one row per split depth,
+reporting the complexity parameter (CP), average/total relative error, and a
+cross-validated error estimate at each depth - the multi-target analogue of
+an `rpart` complexity table:
+
+```{r}
+summ <- MTPartSummary(tree)
+summ$summary_table
+```
+
+`MTSummary()` computes the same per-outcome summary statistics used inside
+`MTPart()`, callable directly on any outcome/data combination - useful for
+inspecting a single node's target distributions:
+
+```{r}
+targets <- list(Definitions = outcome_defs, Z = mutate_example[, outcomes])
+MTSummary(targets, mutate_example)$response
+```
+
+## Pruning
+
+`MTPrune()` performs cost-complexity pruning, dropping splits whose CP falls
+below a chosen threshold:
+
+```{r}
+pruned <- MTPrune(tree, cp = 0.02)
+pruned$partitions
+```
+
+## Scoring new data
+
+`MTTest()` applies a fitted tree's split rules to new data and recomputes the
+per-node outcome summaries and error metrics on that new sample - the
+multi-target analogue of `predict()`:
+
+```{r}
+test_result <- MTTest(tree, features, outcomes, outcome_defs, mutate_example)
+```
+
+## Visualizing the tree
+
+```{r, fig.width=8, fig.height=6}
+PlotTree(tree)
+```
+
+## Tuning hyperparameters
+
+`CV_Tune()` performs a grid search with k-fold cross-validation over
+`depth`, `nodesize`, `evalmethod`, and related tuning parameters. Because it
+fits one MuTATE tree per fold per grid point, even a small grid can take a
+while - the example below uses a minimal single-point grid purely to
+illustrate the call:
+
+```{r, eval = FALSE}
+cv_results <- CV_Tune(
+  features, outcomes, outcome_defs, mutate_example,
+  kfolds = 2, Y = "response",
+  drange = 2, noderange = 30, splitmin_div = 2,
+  method = "avgIG", alpharange = 0.05, igrange = 0.95,
+  psplitrange = 1, pdepthrange = 1, cp_val = 0
+)
+```
+
+For a real tuning run, widen `drange`, `noderange`, and `method` to search a
+meaningful range - see `?CV_Tune` for the full parameter list.

@@ -1,9 +1,10 @@
 #' @name MultiEval
 #' @title Evaluate features across multiple outcomes and outcome types
 #'
-#' @import matrixStats
-#' @import survival
-#' @import reshape2
+#' @importFrom matrixStats rowWeightedMeans
+#' @importFrom survival Surv survreg
+#' @importFrom reshape2 dcast
+#' @importFrom stats deviance lm pnorm quantile residuals glm
 #'
 #' @description Evaluates multiple outcome variables of different types for a set of features.
 #' \code{MultiEval} evaluates multiple outcomes of varying types across all features.
@@ -32,12 +33,22 @@
 #' will use the "quantile" option with the default setting of seq(0,1,0.05).
 #' @param wt The outcome variable weights to be applied in multi-target evaluations.
 #' Default weights are set to \code{NULL}, indicating equal target variable importance.
-#' @param evalmethod The method used to evaluate standardized proportion of information
-#' gain across targets and target types.
-#' @param alpha The significance level to be used in \code{evalmethod} if a p-value based
-#' method (such as ) is selected. The default value for \code{alpha} is set to 0.05.
-#' @param IGcutoff The IG cutoff threshold to be used for \code{evalmethod} if methods
-#' xxx or yyyy are selected. The default value for \code{IGcutoff} is 0.95.
+#' @param evalmethod The method used to rank candidate splits across multiple targets. One of:
+#' \itemize{
+#'   \item \code{"avgIG"} (default): rank by the average standardized information gain across all targets.
+#'   \item \code{"maxIG"}: rank by the maximum standardized information gain achieved on any single target.
+#'   \item \code{"mostIG"}: rank by the number of targets whose standardized information gain exceeds the \code{IGcutoff} quantile.
+#'   \item \code{"avgPVal"}: rank by the average p-value across targets significant at the \code{alpha} level.
+#'   \item \code{"minPVal"}: rank by a weighted combination of the minimum and count of significant (\code{alpha}-level) target p-values.
+#'   \item \code{"mostPVal"}: rank by the number of targets significant at the \code{alpha} level.
+#'   \item \code{"splitError"}: rank by lowest average standardized information gain; used together with the parallel look-ahead search.
+#' }
+#' @param alpha The significance level used to determine which targets are treated as significant
+#' when \code{evalmethod} is a p-value-based method (\code{"avgPVal"}, \code{"minPVal"}, or
+#' \code{"mostPVal"}). The default value for \code{alpha} is set to 0.05.
+#' @param IGcutoff The quantile threshold (between 0 and 1) used to decide whether a split's
+#' standardized information gain for a given target counts as a "meaningful" gain when
+#' \code{evalmethod = "mostIG"}. The default value for \code{IGcutoff} is 0.95.
 #' @param splitmin The minimum sample size \code{n} required for a node to be partitioned.
 #' This is passed internally from \code{MTPart} and is used to assess feasibility of
 #' feature binarization for evaluation (i.e., a binarized feature must result in
@@ -72,6 +83,21 @@
 #'
 #' @return The \code{MultiEval} function returns a vector including of the evaluation
 #' metrics for each possible split of each feature in the dataset.
+#'
+#' @examples
+#' data(mutate_example)
+#' features <- c("age", "sex", "biomarker")
+#' outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+#' outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+#' Ztype <- list(Definitions = outcome_defs, Z = mutate_example[, outcomes])
+#'
+#' eval_result <- MultiEval(X = mutate_example[, features], Ztype = Ztype,
+#'                           data = mutate_example)
+#'
+#' # Single-feature/single-outcome evaluators used internally by MultiEval:
+#' Cat_Eval(X = mutate_example[, features], m = 1,
+#'          Z = mutate_example[, outcomes], k = 1,
+#'          data = mutate_example, continuous = "quantile")
 #'
 #' @usage MultiEval(X, Ztype, data, continuous = "quantile",
 #'           quantseq = seq(0,1,0.05), wt=NULL,

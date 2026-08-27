@@ -56,3 +56,19 @@ A data frame containing the results of hyperparameter tuning for the MTPart mode
 \description{
 This function performs hyperparameter tuning for MTPart models using k-fold cross-validation.
 }
+\examples{
+\donttest{
+data(mutate_example)
+features <- c("age", "sex", "biomarker")
+outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+
+# A minimal single-point grid, just for illustration - a real tuning run
+# would search over wider ranges for drange/noderange/method/etc.
+cv_results <- CV_Tune(features, outcomes, outcome_defs, mutate_example,
+                       kfolds = 2, Y = "response",
+                       drange = 2, noderange = 30, splitmin_div = 2,
+                       method = "avgIG", alpharange = 0.05, igrange = 0.95,
+                       psplitrange = 1, pdepthrange = 1, cp_val = 0)
+}
+}

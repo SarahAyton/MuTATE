@@ -10,8 +10,17 @@
 #'         total relative error, cross-validated error (Xerror), standard
 #'         deviation of cross-validated error (Xstd), and evaluation metric (eval).
 #'
-#' @import dplyr
-#' @import stats
+#' @examples
+#' data(mutate_example)
+#' features <- c("age", "sex", "biomarker")
+#' outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+#' outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+#'
+#' tree <- MTPart(features, outcomes, outcome_defs, mutate_example[1:150, ],
+#'                depth = 2, nodesize = 30)
+#' summ <- MTPartSummary(tree)
+#' summ$summary_table
+#' @importFrom dplyr %>% bind_rows mutate
 #' @export
 
 MTPartSummary <- function(tree) {

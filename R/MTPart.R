@@ -18,12 +18,25 @@
 #' will use the "quantile" option with the default setting of \code{seq(0,1,0.05)}.
 #' @param wt A numeric vector of the outcome variable weights to be applied in multi-target evaluations.
 #' Default weights are set to \code{NULL}, indicating equal target variable importance.
-#' @param evalmethod The method used to evaluate standardized proportion of information
-#' gain across targets and target types.
-#' @param alpha A numeric scalar specifying the significance level to be used in \code{evalmethod} if a p-value based
-#' method (such as ) is selected. The default value for \code{alpha} is set to \code{0.05}.
-#' @param IGcutoff A numeric scalar specifying the IG cutoff threshold to be used for \code{evalmethod} if methods
-#' xxx or yyyy are selected. The default value for \code{IGcutoff} is \code{0.95}.
+#' @param evalmethod The method used to rank candidate splits across multiple targets. One of:
+#' \itemize{
+#'   \item \code{"avgIG"} (default): rank by the average standardized information gain across all targets.
+#'   \item \code{"maxIG"}: rank by the maximum standardized information gain achieved on any single target.
+#'   \item \code{"mostIG"}: rank by the number of targets whose standardized information gain exceeds the \code{IGcutoff} quantile.
+#'   \item \code{"avgPVal"}: rank by the average p-value across targets significant at the \code{alpha} level.
+#'   \item \code{"minPVal"}: rank by a weighted combination of the minimum and count of significant (\code{alpha}-level) target p-values.
+#'   \item \code{"mostPVal"}: rank by the number of targets significant at the \code{alpha} level.
+#'   \item \code{"splitError"}: rank by lowest average standardized information gain; used together with the parallel look-ahead search (\code{parallelpart = TRUE}).
+#' }
+#' @param alpha A numeric scalar specifying the significance level used to determine which targets
+#' are treated as significant when \code{evalmethod} is a p-value-based method (\code{"avgPVal"},
+#' \code{"minPVal"}, or \code{"mostPVal"}): a target's split p-value must be less than or equal to
+#' \code{alpha} to count as significant. The default value for \code{alpha} is set to \code{0.05}.
+#' @param IGcutoff A numeric scalar (between 0 and 1) specifying the quantile threshold used to decide
+#' whether a split's standardized information gain for a given target counts as a "meaningful" gain
+#' when \code{evalmethod = "mostIG"}. Splits with information gain at or above the \code{IGcutoff}
+#' quantile (computed across candidate splits for that target) count toward the total number of
+#' targets with meaningful gain. The default value for \code{IGcutoff} is \code{0.95}.
 #' @param depth An integer scalar specifying the maximum depth of the tree (default is \code{6})
 #' @param nodesize An integer scalar specifying the minimum number of samples per node (default is \code{20})
 #' @param cp A numeric scalar specifying the complexity parameter for pruning (default is \code{0.02})
@@ -36,6 +49,26 @@
 #' feature binarization for evaluation (i.e., a binarized feature must result in
 #' partitions with sufficient observations in both child nodes). The default value is of
 #' \code{splitmin} is set to half of the \code{nodesize}.
+#'
+#' @return A list with two elements:
+#' \itemize{
+#'   \item \code{partitions}: a data frame of parent/child node ID relationships describing the tree structure.
+#'   \item \code{tree_nodes}: a list of per-node details (split variable/threshold, sample size, target summaries, error metrics).
+#' }
+#' Pass this object to \code{\link{MTTest}} to score new data, \code{\link{MTPrune}} to prune it,
+#' \code{\link{MTPartSummary}} or \code{\link{MTSummary}} to summarize it, or \code{\link{PlotTree}} to visualize it.
+#'
+#' @examples
+#' data(mutate_example)
+#' features <- c("age", "sex", "biomarker")
+#' outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+#' outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+#'
+#' # A 150-row subset keeps this example fast; MTPart's split search scales
+#' # with the number of split candidates evaluated per node.
+#' tree <- MTPart(features, outcomes, outcome_defs, mutate_example[1:150, ],
+#'                depth = 2, nodesize = 30)
+#' str(tree$partitions)
 #' @export
 
 
@@ -43,12 +76,11 @@ MTPart <- function(features, outcomes, outcome_defs, data, continuous = "quantil
                    wt=NULL, evalmethod = "avgIG", alpha = 0.05, IGcutoff = 0.95, depth=4,
                    nodesize=20, cp=-1.0, reuse=FALSE, parallelpart=FALSE, parallelsplit=NA,
                    paralleldepth=NA, splitmin=floor(nodesize/2)) { #and all inputs for MultiEval
-  Z <- list("Definitions"=outcome_defs, "Z"=data[,c(outcomes)])
-  X <- data[,c(features)]
-  wt <<- wt
-  reuse <<- reuse
-  cp <<- cp
-  nodesize <<- as.numeric(nodesize)
+  validate_core_inputs(features, outcomes, outcome_defs, data, wt)
+  validate_mtpart_params(depth, nodesize, cp, continuous)
+  Z <- list("Definitions"=outcome_defs, "Z"=data[,c(outcomes),drop=FALSE])
+  X <- data[,c(features),drop=FALSE]
+  nodesize <- as.numeric(nodesize)
   mtpart_splits <- split_df <- splitX <- splitZ <- vector(mode = "list", length = 2^(depth))
   i <- 1
   split_df[[i]] <- temp  <- data

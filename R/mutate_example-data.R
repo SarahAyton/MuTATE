@@ -1,0 +1,27 @@
+#' Synthetic example dataset for MuTATE
+#'
+#' A small simulated dataset used in function examples and tests. It is purely
+#' illustrative (not derived from real patient data) and is designed to exercise
+#' all four outcome types supported by \code{\link{MTPart}}: categorical,
+#' continuous, count, and survival.
+#'
+#' @format A data frame with 200 rows and 9 variables:
+#' \describe{
+#'   \item{age}{Continuous feature: simulated patient age.}
+#'   \item{sex}{Categorical feature: \code{"F"} or \code{"M"}.}
+#'   \item{biomarker}{Continuous feature: simulated biomarker level.}
+#'   \item{response}{Categorical outcome: \code{"responder"} or \code{"non_responder"}.}
+#'   \item{tumor_size}{Continuous outcome: simulated tumor size.}
+#'   \item{ae_count}{Count outcome: simulated adverse event count.}
+#'   \item{time}{Survival outcome: time-to-event.}
+#'   \item{status}{Survival outcome: event indicator (1 = event, 0 = censored).}
+#'   \item{OS_definition_time_status}{Placeholder column required by \code{\link{MTPart}}'s
+#'   survival-outcome naming convention: the outcome name passed via \code{outcomes} must
+#'   itself be a column in \code{data}, and its 3rd and 4th underscore-separated tokens
+#'   (\code{time}, \code{status}) must match the actual time/event column names.}
+#' }
+#'
+#' @examples
+#' data(mutate_example)
+#' head(mutate_example)
+"mutate_example"

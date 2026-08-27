@@ -10,8 +10,18 @@ PlotTree(tree)
 \item{tree}{A decision tree object.}
 }
 \value{
-A plot of the multi-target decision tree.
+A plot of the multi-target decision tree (invisible; called for its plotting side effect).
 }
 \description{
 Plot a multi-target decision tree.
+}
+\examples{
+data(mutate_example)
+features <- c("age", "sex", "biomarker")
+outcomes <- c("response", "tumor_size", "ae_count", "OS_definition_time_status")
+outcome_defs <- c("Cat", "Cont", "Count", "Surv")
+
+tree <- MTPart(features, outcomes, outcome_defs, mutate_example[1:150, ],
+               depth = 2, nodesize = 30)
+PlotTree(tree)
 }

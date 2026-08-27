@@ -44,6 +44,12 @@
 #'
 #' @return A list containing two data frames: the modified predictor variable
 #' data frame and the modified response variable data frame.
+#'
+#' @examples
+#' data(mutate_example)
+#' features <- c("age", "sex", "biomarker")
+#' prep <- SplitPrep(Xdf = mutate_example[, features], df = mutate_example,
+#'                    data_splt = mutate_example, parentsplit = "skip")
 #' @export
 
 SplitPrep <- function(Xdf, df, data_splt, parentsplit) {

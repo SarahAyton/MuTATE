@@ -57,3 +57,9 @@ returns a list containing \code{splitX_df} and \code{split_data_df}.
 This function is used to pre-process data before fitting tree-based models to ensure
 that only suitable predictor variables are used for splitting.
 }
+\examples{
+data(mutate_example)
+features <- c("age", "sex", "biomarker")
+prep <- SplitPrep(Xdf = mutate_example[, features], df = mutate_example,
+                   data_splt = mutate_example, parentsplit = "skip")
+}
